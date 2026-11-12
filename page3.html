@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page 3 – Pick a paper ball</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#07060d;--glow:#2a1457;}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:radial-gradient(ellipse at 50% 30%,var(--glow) 0%,var(--ink) 65%);color:#fff;font-family:'Fredoka',system-ui,sans-serif;overflow:hidden;display:flex;flex-direction:column;align-items:center}
+.back{position:fixed;top:12px;left:14px;color:#ffffff88;text-decoration:none;font-size:14px;z-index:5}
+.back:hover{color:#fff}
+header{text-align:center;padding:clamp(14px,4vh,40px) 16px 0;position:relative;z-index:2}
+h1{font-family:'Caveat',cursive;font-size:clamp(34px,7vw,64px);line-height:1;text-shadow:0 0 24px #b58cff88}
+header p{margin-top:8px;font-size:clamp(13px,2.4vw,17px);color:#d7c9ff;max-width:34ch;margin-inline:auto}
+.deco{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.deco span{position:absolute;bottom:-40px;opacity:0;animation:rise linear infinite}
+@keyframes rise{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.8}90%{opacity:.6}100%{transform:translateY(-115vh) rotate(40deg);opacity:0}}
+.grid{flex:1;display:grid;grid-template-columns:repeat(2,auto);gap:clamp(8px,3vh,28px) clamp(14px,6vw,70px);align-content:center;justify-content:center;position:relative;z-index:2;padding-bottom:3vh}
+.ball{background:none;border:0;cursor:pointer;width:min(40vw,27vh,240px);aspect-ratio:1;animation:float 5s ease-in-out infinite;animation-delay:var(--d);transition:filter .3s}
+.ball svg{width:100%;height:100%;overflow:visible;animation:jiggle 7s ease-in-out infinite;animation-delay:var(--j);transition:transform .25s}
+.ball:hover svg,.ball:focus-visible svg{transform:scale(1.1) rotate(-4deg)}
+.ball:active svg{transform:scale(.94)}
+.ball:focus-visible{outline:3px dashed #fff;outline-offset:6px;border-radius:50%}
+.ball.opened{filter:saturate(.35) brightness(.7)}
+.ball.opened svg{animation:none;transform:scale(.88)}
+.ball text{font-family:'Caveat',cursive;font-weight:700;font-size:25px;fill:#fff;stroke:#0008;stroke-width:4px;paint-order:stroke;text-anchor:middle}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-14px) rotate(3deg)}}
+@keyframes jiggle{0%,86%,100%{transform:rotate(0)}89%{transform:rotate(-7deg)}92%{transform:rotate(6deg)}95%{transform:rotate(-3deg)}}
+#stage{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:#000c;backdrop-filter:blur(6px)}
+#stage.on{display:flex;animation:fade .3s}
+@keyframes fade{from{opacity:0}}
+#wrap{filter:drop-shadow(0 18px 34px #000b)}
+#paper{position:relative;width:min(92vw,620px);height:min(84vh,700px)}
+#paper .base,#paper .tex{position:absolute;inset:0;width:100%;height:100%}
+#paper .content{position:absolute;inset:0;padding:clamp(14px,3vh,24px);display:flex;flex-direction:column;align-items:center;gap:10px;color:#1b1030;opacity:0;transition:opacity .5s}
+#paper.ready .content{opacity:1}
+.cap{font-family:'Caveat',cursive;font-size:clamp(26px,5vw,38px);font-weight:700;text-align:center;line-height:1.05}
+.media{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.media video{max-width:100%;max-height:100%;border-radius:12px;background:#000;box-shadow:0 8px 22px #0006;animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.polaroid{position:relative;background:#fff;padding:10px 10px 46px;border-radius:4px;box-shadow:0 10px 26px #0007;max-height:100%;max-width:100%;display:flex;animation:drop .9s cubic-bezier(.2,1.5,.4,1) both}
+.polaroid img{display:block;max-width:100%;max-height:calc(min(84vh,700px) - 190px);object-fit:contain}
+.polaroid .pc{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-family:'Caveat',cursive;font-size:25px;font-weight:700;color:#333}
+@keyframes pop{from{transform:scale(.3) rotate(-8deg);opacity:0}}
+@keyframes drop{0%{transform:translateY(-120%) rotate(-18deg) scale(.6);opacity:0}100%{transform:rotate(-2deg)}}
+.row{display:flex;gap:10px;min-height:44px;align-items:center}
+.btn{font:600 17px 'Fredoka',sans-serif;border:0;border-radius:99px;padding:10px 22px;cursor:pointer;background:#1b1030;color:#fff;box-shadow:0 4px 0 #0006;transition:transform .15s}
+.btn:hover{transform:translateY(-2px) scale(1.05)}
+.btn.ghost{background:#ffffff99;color:#1b1030}
+#flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:70}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:60}
+#next{position:fixed;bottom:4vh;left:50%;translate:-50% 0;z-index:40;display:none;font-size:20px;padding:14px 30px;background:linear-gradient(90deg,#ff5d73,#8b6cff);animation:beat 1.2s infinite}
+#next.on{display:block}
+@keyframes beat{50%{transform:scale(1.08)}}
+.toast{position:absolute;bottom:-34px;font-size:13px;color:#fff;opacity:.9}
+@media (prefers-reduced-motion:reduce){.ball,.ball svg,.deco span{animation:none}}
+</style>
+</head>
+<body>
+<a class="back" href="page2.html">← back</a>
+
+<!-- wrinkle filters (one per ball colour) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="filters"></defs></svg>
+
+<div class="deco" id="deco"></div>
+
+<header>
+  <h1>Four crumpled surprises 🎁</h1>
+  <p>Pick a ball… each one hides something 😏</p>
+</header>
+
+<main class="grid" id="grid"></main>
+
+<button class="btn" id="next" onclick="location.href='page4.html'">Continue to the next surprise 💌</button>
+
+<div id="stage" aria-live="polite">
+  <div id="wrap">
+    <div id="paper">
+      <div class="base"></div>
+      <svg class="tex" viewBox="0 0 400 560" preserveAspectRatio="none"><rect id="texrect" width="400" height="560"/></svg>
+      <div class="content">
+        <div class="cap" id="cap"></div>
+        <div class="media" id="media"></div>
+        <div class="row" id="row"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="flash"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+/* ---------- config ---------- */
+const BALLS=[
+ {n:1,c:'#ff5d73',d:'#a81c38',l:'#ffd0d7',cap:'Exhibit A: certified cutie 📸'},
+ {n:2,c:'#ffc93c',d:'#b07400',l:'#fff1b8',cap:'Main character energy ✨'},
+ {n:3,c:'#3fd0c9',d:'#0f7b78',l:'#c8fffb',cap:'Warning: may cause smiling 😄'},
+ {n:4,c:'#8b6cff',d:'#4126b0',l:'#e0d6ff',cap:'The legend herself 👑'}
+];
+const VID_EXT=['mp4','webm','mov','m4v'];
+const IMG_EXT=['jpg','jpeg','png','webp','JPG','PNG'];
+const WAIT=['Wait for it… 👀','Brace yourself 😂','Meme time 🍿','Loading chaos… 🌀'];
+const $=id=>document.getElementById(id);
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+
+/* ---------- build balls ---------- */
+const filters=$('filters'),grid=$('grid');
+BALLS.forEach((b,i)=>{
+  filters.insertAdjacentHTML('beforeend',`<filter id="f${b.n}" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.03 0.05" numOctaves="4" seed="${b.n*5}" result="n"/>
+    <feDiffuseLighting in="n" lighting-color="#fff" surfaceScale="9" diffuseConstant="1.35" result="l"><feDistantLight azimuth="225" elevation="52"/></feDiffuseLighting>
+    <feComposite in="l" in2="SourceAlpha" operator="in" result="lit"/>
+    <feBlend in="SourceGraphic" in2="lit" mode="multiply" result="m"/>
+    <feComposite in="m" in2="SourceAlpha" operator="in"/></filter>`);
+  const N=13,pts=[];
+  for(let k=0;k<N;k++){const a=k/N*Math.PI*2+(rnd()-.5)*.25,r=72+rnd()*18;pts.push((100+Math.cos(a)*r).toFixed(1)+','+(92+Math.sin(a)*r).toFixed(1));}
+  const btn=document.createElement('button');
+  btn.className='ball';btn.setAttribute('aria-label','Paper ball '+b.n+', click to open');
+  btn.style.setProperty('--d',(-i*1.3)+'s');btn.style.setProperty('--j',(-i*1.7)+'s');
+  btn.innerHTML=`<svg viewBox="0 0 200 200"><defs><radialGradient id="g${b.n}" cx="35%" cy="30%" r="80%">
+    <stop offset="0" stop-color="${b.l}"/><stop offset=".55" stop-color="${b.c}"/><stop offset="1" stop-color="${b.d}"/></radialGradient></defs>
+    <ellipse cx="100" cy="184" rx="58" ry="7" fill="#0007"/>
+    <polygon points="${pts.join(' ')}" fill="url(#g${b.n})" filter="url(#f${b.n})" stroke="${b.d}" stroke-width="1.5" stroke-linejoin="round"/>
+    <g transform="rotate(-9 100 92)"><text class="t1" x="100" y="88">click</text><text class="t2" x="100" y="114">to open</text></g></svg>`;
+  btn.onclick=()=>openBall(i,btn);
+  grid.appendChild(btn);
+});
+
+/* floating background bits */
+['✨','💖','⭐','🎈','🌸','💫'].forEach((e,i)=>{for(let k=0;k<5;k++){const s=document.createElement('span');s.textContent=e;
+  s.style.left=Math.random()*100+'%';s.style.fontSize=(14+Math.random()*18)+'px';
+  s.style.animationDuration=(12+Math.random()*14)+'s';s.style.animationDelay=(-Math.random()*20)+'s';$('deco').appendChild(s);}});
+
+/* ---------- audio (synthesised, no files needed) ---------- */
+let ac;
+function audio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();}catch(e){}}
+function crinkle(total=1.5,n=16){if(!ac)return;for(let k=0;k<n;k++){
+  const dur=.04+Math.random()*.08,len=ac.sampleRate*dur,buf=ac.createBuffer(1,len,ac.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2);
+  const s=ac.createBufferSource();s.buffer=buf;
+  const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=1500+Math.random()*4500;f.Q.value=.8;
+  const g=ac.createGain();g.gain.value=.25+Math.random()*.35;
+  s.connect(f);f.connect(g);g.connect(ac.destination);s.start(ac.currentTime+Math.random()*total);}}
+function chime(){if(!ac)return;[523,659,784,1047].forEach((fr,i)=>{
+  const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+i*.09;
+  o.type='triangle';o.frequency.value=fr;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.25,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.5);
+  o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+.55);});}
+
+/* ---------- confetti ---------- */
+const cv=$('confetti'),cx=cv.getContext('2d');let parts=[],raf=0;
+function size(){cv.width=innerWidth;cv.height=innerHeight}addEventListener('resize',size);size();
+function burst(){const cols=['#ff5d73','#ffc93c','#3fd0c9','#8b6cff','#fff'];
+  for(let i=0;i<170;i++){const a=Math.random()*Math.PI*2,v=6+Math.random()*12;
+    parts.push({x:innerWidth/2,y:innerHeight*.45,vx:Math.cos(a)*v,vy:Math.sin(a)*v-6,r:Math.random()*6,vr:(Math.random()-.5)*.4,w:6+Math.random()*7,h:4+Math.random()*6,c:cols[i%5]});}
+  if(!raf)loop();}
+function loop(){cx.clearRect(0,0,cv.width,cv.height);
+  parts.forEach(p=>{p.vy+=.3;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore();});
+  parts=parts.filter(p=>p.y<innerHeight+30);raf=parts.length?requestAnimationFrame(loop):0;if(!raf)cx.clearRect(0,0,cv.width,cv.height);}
+
+/* ---------- paper unwrap ---------- */
+const paper=$('paper'),stage=$('stage'),wrap=$('wrap');
+const CIRCLE=Array.from({length:16},(_,i)=>{const a=(-135+i*22.5)*Math.PI/180,r=(i%4===0?46:44)+Math.random()*6;return`${(50+Math.cos(a)*r).toFixed(1)}% ${(50+Math.sin(a)*r).toFixed(1)}%`}).join(',');
+const RECT='0% 0%,25% 0%,50% 0%,75% 0%,100% 0%,100% 25%,100% 50%,100% 75%,100% 100%,75% 100%,50% 100%,25% 100%,0% 100%,0% 75%,0% 50%,0% 25%';
+const SCRUNCH=Array.from({length:16},(_,i)=>{const a=(-135+i*22.5)*Math.PI/180,r=(i%4===0?62:48)+Math.random()*10;return`${(50+Math.cos(a)*r*1.1).toFixed(1)}% ${(50+Math.sin(a)*r*.8).toFixed(1)}%`}).join(',');
+let busy=false,opened=0;
+
+function unwrap(b,fromEl){
+  paper.querySelector('.base').style.background=`linear-gradient(135deg,${b.l},${b.c})`;
+  const rect=$('texrect');rect.setAttribute('fill',b.c);rect.setAttribute('filter',`url(#f${b.n})`);
+  const r=fromEl.getBoundingClientRect(),dx=r.left+r.width/2-innerWidth/2,dy=r.top+r.height/2-innerHeight/2;
+  const kf=[
+   {transform:`translate(${dx}px,${dy}px) scale(.24) rotate(0deg)`,clipPath:`polygon(${CIRCLE})`,offset:0},
+   {transform:`translate(${dx*.5}px,${dy*.5}px) scale(.45) rotate(35deg)`,clipPath:`polygon(${CIRCLE})`,offset:.22},
+   {transform:`translate(0,0) scale(.7,.6) rotate(-14deg)`,clipPath:`polygon(${SCRUNCH})`,offset:.5},
+   {transform:`translate(0,0) scale(1.05,.95) rotate(5deg)`,clipPath:`polygon(${RECT})`,offset:.78},
+   {transform:`translate(0,0) scale(1) rotate(0deg)`,clipPath:`polygon(${RECT})`,offset:1}];
+  const a=paper.animate(kf,{duration:1900,easing:'ease-in-out',fill:'forwards'});
+  $('texrect').parentNode.animate([{opacity:1},{opacity:.42}],{duration:1900,delay:300,fill:'forwards'});
+  return a.finished;
+}
+
+async function openBall(i,btn){
+  if(busy||btn.classList.contains('opened'))return;busy=true;audio();
+  const b=BALLS[i];
+  $('cap').textContent='';$('media').innerHTML='';$('row').innerHTML='';
+  paper.classList.remove('ready');wrap.getAnimations().forEach(x=>x.cancel());
+  stage.classList.add('on');crinkle(1.7,18);
+  await unwrap(b,btn);
+  paper.style.clipPath='none';paper.classList.add('ready');
+  showMeme(i,btn);
+}
+
+function tryList(base,exts,mk,fail){let k=0;const go=()=>{if(k>=exts.length){fail();return}mk(`${base}.${exts[k++]}`,go)};go();}
+
+function showMeme(i,btn){
+  const b=BALLS[i],media=$('media'),row=$('row');
+  $('cap').textContent=WAIT[i%WAIT.length];
+  const v=document.createElement('video');v.playsInline=true;v.preload='auto';
+  let done=false;const finish=()=>{if(done)return;done=true;v.pause();revealPhoto(i,btn)};
+  VID_EXT.forEach(e=>{const s=document.createElement('source');s.src=`meme3${b.n}.${e}`;
+    s.type={mp4:'video/mp4',webm:'video/webm',mov:'video/quicktime',m4v:'video/mp4'}[e];v.appendChild(s);});
+  v.lastChild.addEventListener('error',()=>{$('cap').textContent='(meme3'+b.n+' not found – skipping 😅)';setTimeout(finish,1400)});
+  v.addEventListener('ended',finish);
+  v.addEventListener('click',()=>{v.muted=!v.muted});
+  media.appendChild(v);
+  const p=v.play();
+  if(p&&p.catch)p.catch(()=>{v.muted=true;v.play().catch(()=>{});row.insertAdjacentHTML('afterbegin','<span class="toast">🔇 tap the video to unmute</span>');});
+  const skip=document.createElement('button');skip.className='btn ghost';skip.textContent='Skip meme ⏭';skip.onclick=finish;row.appendChild(skip);
+}
+
+function revealPhoto(i,btn){
+  const b=BALLS[i],media=$('media'),row=$('row');
+  media.innerHTML='';row.innerHTML='';
+  const fl=$('flash');fl.animate([{opacity:.9},{opacity:0}],{duration:600});
+  audio();chime();burst();
+  $('cap').textContent='Ta-daaa! 🎉';
+  const pol=document.createElement('div');pol.className='polaroid';
+  const img=new Image();img.alt='Her photo '+b.n;
+  tryList(`pht3${b.n}`,IMG_EXT,(src,next)=>{img.onerror=next;img.src=src},()=>{img.remove();pol.insertAdjacentHTML('afterbegin',`<div style="padding:60px 24px;color:#333">pht3${b.n} not found 🥲</div>`)});
+  const c=document.createElement('div');c.className='pc';c.textContent=b.cap;
+  pol.append(img,c);media.appendChild(pol);
+  const close=document.createElement('button');close.className='btn';
+  close.textContent=opened<3?'Next ball 🎈':'Done 🎉';close.onclick=()=>closeStage(btn);row.appendChild(close);
+}
+
+function closeStage(btn){
+  crinkle(.5,6);
+  const a=wrap.animate([{transform:'scale(1) rotate(0)',opacity:1},{transform:'scale(.1) rotate(200deg)',opacity:0}],{duration:520,easing:'ease-in',fill:'forwards'});
+  a.finished.then(()=>{
+    stage.classList.remove('on');wrap.getAnimations().forEach(x=>x.cancel());
+    btn.classList.add('opened');btn.querySelector('.t1').textContent='opened';btn.querySelector('.t2').textContent='✓';
+    opened++;busy=false;
+    if(opened===BALLS.length)$('next').classList.add('on');
+  });
+}
+addEventListener('keydown',e=>{if(e.key==='Escape'&&$('row').querySelector('.btn:not(.ghost)'))$('row').querySelector('.btn').click()});
+</script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy Birthday!</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#ffd35c;--pink:#ff7eb6;--ink:#fff7e6;--glass:rgba(255,255,255,.09)}
+*{box-sizing:border-box;margin:0}
+html,body{min-height:100%}
+body{font-family:'Fredoka','Trebuchet MS',sans-serif;color:var(--ink);overflow:hidden;
+ background:radial-gradient(ellipse at 50% 30%,#1c0f52 0%,#0a0630 45%,#020112 100%) fixed}
+body.scroll{overflow-y:auto;overflow-x:hidden}
+#stars{position:fixed;inset:0;pointer-events:none}
+#stars i{position:absolute;background:#fff;border-radius:50%;animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.15}50%{opacity:1}}
+.shoot{position:fixed;width:120px;height:2px;background:linear-gradient(90deg,#fff,transparent);top:-10px;left:80%;opacity:0;transform:rotate(35deg);animation:sh 7s linear infinite;pointer-events:none}
+@keyframes sh{0%{opacity:0;transform:translate(0,0) rotate(35deg)}3%{opacity:1}12%{opacity:0;transform:translate(-520px,380px) rotate(35deg)}100%{opacity:0}}
+#scene{position:relative;height:100vh;transition:height 1.4s cubic-bezier(.6,0,.2,1)}
+#scene.shrunk{height:48vh;min-height:300px}
+h1{position:absolute;top:4%;width:100%;text-align:center;font-size:clamp(30px,7vw,64px);font-weight:700;letter-spacing:.5px;
+ background:linear-gradient(90deg,#ffd35c,#ff7eb6,#8ee3ff,#ffd35c);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+ animation:shim 5s linear infinite;z-index:5;transition:font-size 1s}
+@keyframes shim{to{background-position:300% 0}}
+#sun{position:absolute;left:50%;top:50%;width:clamp(70px,15vmin,130px);aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);z-index:2;cursor:pointer;
+ background:radial-gradient(circle at 35% 35%,#fff7b0,#ffc83d 45%,#ff8a1f 80%);
+ box-shadow:0 0 40px 12px rgba(255,170,40,.7),0 0 120px 40px rgba(255,120,20,.35);animation:pulse 2.4s ease-in-out infinite}
+#sun::before{content:"";position:absolute;inset:-28%;border-radius:50%;border:2px dashed rgba(255,200,80,.55);animation:spin 14s linear infinite}
+@keyframes pulse{50%{box-shadow:0 0 60px 20px rgba(255,170,40,.85),0 0 160px 60px rgba(255,120,20,.4)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+#ring{position:absolute;left:50%;top:50%;border:1.5px dashed rgba(255,255,255,.18);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
+#planet{position:absolute;left:0;top:0;width:clamp(80px,15vmin,130px);aspect-ratio:1;opacity:0;will-change:transform}
+#planet img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid var(--gold);box-shadow:0 0 22px rgba(255,211,92,.8)}
+.hint{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);font-size:14px;opacity:0;transition:opacity 1s;z-index:6}
+.hint.on{opacity:.8;animation:bob 1.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translate(-50%,6px)}}
+#cards{max-width:960px;margin:0 auto;padding:10px 16px 70px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:var(--glass);border:1.5px solid rgba(255,255,255,.2);border-radius:26px;padding:22px 20px;text-align:center;backdrop-filter:blur(8px);
+ opacity:0;transform:translateY(40px) scale(.92);transition:opacity .8s,transform .8s cubic-bezier(.3,1.5,.5,1)}
+.card.in{opacity:1;transform:none}
+.card.wide{grid-column:1/-1;padding-bottom:16px}
+.card small{display:block;font-size:15px;opacity:.85}
+.big{font-size:clamp(54px,12vw,96px);font-weight:700;line-height:1;margin:6px 0;color:var(--gold);text-shadow:0 0 24px rgba(255,211,92,.55)}
+.mid{font-size:clamp(22px,4.4vw,30px);color:var(--pink);font-weight:600;min-height:1.3em}
+.slider{position:relative;margin-top:8px}
+.track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.track::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;scroll-snap-align:center;padding:4px 44px 8px}
+.slide b{display:block;font-size:clamp(34px,7vw,52px);color:var(--gold)}
+.slide em{display:block;font-style:normal;font-size:38px;margin:2px 0}
+.slide h3{font-size:clamp(18px,3.6vw,23px);margin-bottom:4px}
+.slide p{font-size:16px;opacity:.88;max-width:48ch;margin:0 auto;line-height:1.4}
+.nav{position:absolute;top:42%;width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:20px;cursor:pointer}
+.nav:hover{background:rgba(255,255,255,.32)}.nav:focus-visible{outline:2px solid var(--gold)}
+#prev{left:0}#next{right:0}
+.dots{display:flex;justify-content:center;gap:7px;margin-top:6px}
+.dots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);transition:.3s}
+.dots i.on{background:var(--gold);transform:scale(1.4)}
+#oldie{position:fixed;left:0;top:0;z-index:20;pointer-events:none;opacity:0;transition:opacity 1s;text-align:center;will-change:transform}
+#oldie.on{opacity:1}
+#oldie img{width:clamp(92px,18vmin,145px);aspect-ratio:1;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 6px 20px rgba(0,0,0,.5);display:block;margin:auto}
+#oldie span{display:inline-block;margin-top:6px;background:#fff;color:#3a1c63;font-weight:700;font-size:14px;padding:4px 12px;border-radius:16px;white-space:nowrap;animation:wob .6s ease-in-out infinite alternate}
+@keyframes wob{from{transform:rotate(-4deg)}to{transform:rotate(4deg) scale(1.06)}}
+.fl{position:fixed;bottom:-40px;font-size:24px;pointer-events:none;z-index:4;animation:rise linear forwards}
+@keyframes rise{to{transform:translateY(-115vh) rotate(40deg);opacity:0}}
+#go{position:fixed;right:14px;bottom:16px;z-index:30;text-decoration:none;color:#2a1050;font-weight:700;font-size:18px;padding:12px 22px;border-radius:30px;
+ background:linear-gradient(90deg,#ffd35c,#ff9ecb);box-shadow:0 0 22px rgba(255,200,100,.6);opacity:0;pointer-events:none;transform:translateX(30px);transition:opacity .8s,transform .8s}
+#go.on{opacity:1;pointer-events:auto;transform:none;animation:nudge 1.6s ease-in-out infinite 1s}
+#go:focus-visible{outline:3px solid #fff}
+@keyframes nudge{50%{transform:translateX(6px)}}
+#snd{position:fixed;right:12px;top:12px;z-index:30;border:0;border-radius:20px;padding:8px 14px;background:rgba(255,255,255,.18);color:#fff;font:inherit;cursor:pointer}
+@media(max-width:640px){#cards{grid-template-columns:1fr}.slide{padding:4px 38px 8px}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div class="shoot"></div><div class="shoot" style="left:55%;animation-delay:3s"></div><div class="shoot" style="left:95%;animation-delay:5s"></div>
+<button id="snd" aria-label="Toggle sound">🔊 Tap for sound</button>
+
+<section id="scene">
+  <div id="ring"></div>
+  <div id="sun" title="Tap me!"></div>
+  <div id="planet"><img id="me" src="page21.jpeg" alt="Birthday star"></div>
+</section>
+
+<main id="cards">
+  <div class="card"><small>You have revolved around the sun</small><div class="big" id="yrs">0</div><small>times! 🌍☀️</small><div class="mid" id="lapMsg"></div></div>
+  <div class="card"><small>You have been shining for</small><div class="big" id="days">0</div><small>days 🌟</small><div class="mid" id="clock"></div></div>
+  <div class="card wide">
+    <small>What made 13 November special? Swipe 👉</small>
+    <div class="slider">
+      <button class="nav" id="prev" aria-label="Previous">‹</button>
+      <div class="track" id="track"></div>
+      <button class="nav" id="next" aria-label="Next">›</button>
+    </div>
+    <div class="dots" id="dots"></div>
+  </div>
+</main>
+
+<div id="oldie"><img id="old" src="page22.jpeg" alt=""><span>Buddhi ho rahi hai 👵</span></div>
+<a id="go" href="page3.html">Next ›</a>
+<div class="hint" id="hint">scroll ↓</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const PH="data:image/svg+xml,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><circle cx='50' cy='50' r='50' fill='#ff9ecb'/><text x='50' y='66' font-size='50' text-anchor='middle'>🙂</text></svg>");
+$('#me').onerror=e=>e.target.src=PH; $('#old').onerror=e=>e.target.src=PH;
+
+/* stars */
+const st=$('#stars');
+for(let i=0;i<130;i++){const s=document.createElement('i'),z=Math.random()*2.2+.6;
+ s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${z}px;height:${z}px;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*3}s`;st.appendChild(s)}
+
+/* sound: synthesized "wo-hoo" */
+let ac=null,muted=false;
+try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}
+function wohoo(){
+ if(muted||!ac||ac.state!=='running')return;
+ const t=ac.currentTime,o=ac.createOscillator();o.type='sawtooth';const f=o.frequency;
+ f.setValueAtTime(260,t);f.linearRampToValueAtTime(480,t+.22);f.linearRampToValueAtTime(330,t+.38);
+ f.linearRampToValueAtTime(720,t+.75);f.linearRampToValueAtTime(420,t+1.2);
+ const l=ac.createOscillator(),lg=ac.createGain();l.frequency.value=6;lg.gain.value=14;l.connect(lg);lg.connect(f);
+ const bp=ac.createBiquadFilter();bp.type='bandpass';bp.Q.value=3;
+ bp.frequency.setValueAtTime(450,t);bp.frequency.linearRampToValueAtTime(900,t+.75);bp.frequency.linearRampToValueAtTime(600,t+1.2);
+ const g=ac.createGain(),G=g.gain;G.setValueAtTime(0,t);G.linearRampToValueAtTime(.9,t+.05);G.setValueAtTime(.9,t+.3);
+ G.linearRampToValueAtTime(.2,t+.4);G.linearRampToValueAtTime(.9,t+.5);G.setValueAtTime(.9,t+1);G.linearRampToValueAtTime(0,t+1.25);
+ o.connect(bp);bp.connect(g);g.connect(ac.destination);o.start(t);l.start(t);o.stop(t+1.3);l.stop(t+1.3);
+}
+function label(){$('#snd').textContent=muted?'🔇 Sound off':'🔊 Sound on'}
+function unlock(){if(ac&&ac.state==='suspended')ac.resume().then(()=>{label();wohoo()})}
+if(ac&&ac.state==='running')label();
+['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,unlock,{once:true}));
+$('#snd').onclick=e=>{e.stopPropagation();muted=!muted;label();if(!muted){unlock();wohoo()}};
+$('#sun').onclick=wohoo; $('#planet').onclick=wohoo;
+
+/* orbit */
+const scene=$('#scene'),planet=$('#planet'),ring=$('#ring'),P=3.4,T0=1.2;
+let lap=-1,shown=false;const t00=performance.now();
+function frame(now){
+ const t=(now-t00)/1000,w=scene.clientWidth,h=scene.clientHeight;
+ const k=Math.min(1,Math.max(0,(t-T0)/1.6)),e=1-Math.pow(1-k,3);
+ const rx=Math.min(w*.42,430),ry=Math.min(h*.30,190);
+ const a=Math.max(0,t-T0)/P*Math.PI*2-Math.PI/2,d=Math.sin(a);
+ const x=w/2+Math.cos(a)*rx*e,y=h/2+d*ry*e;
+ planet.style.opacity=k>0?1:0;
+ planet.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%) scale(${e*(.85+.2*d)}) rotate(${Math.sin(t*2)*8}deg)`;
+ planet.style.zIndex=d>0?3:1;
+ ring.style.width=rx*2*e+'px';ring.style.height=ry*2*e+'px';
+ if(t>T0){const L=Math.floor((t-T0)/P);if(L!==lap){lap=L;if(L<3)wohoo()}}
+ if(!shown&&t>T0+P*2+.5){shown=true;reveal()}
+ oldie(t);
+ requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* floating old photo */
+const od=$('#oldie');
+function oldie(t){
+ if(t<3.5)return; od.classList.add('on');
+ const w=innerWidth-180,h=innerHeight-230;
+ const x=w*(.5+.5*Math.sin(t*.33+1))+10,y=h*(.5+.5*Math.sin(t*.27))+10;
+ od.style.transform=`translate(${x}px,${y}px) rotate(${Math.sin(t*1.4)*10}deg)`;
+}
+
+/* cards */
+function reveal(){
+ scene.classList.add('shrunk');document.body.classList.add('scroll');
+ setTimeout(()=>{document.querySelectorAll('.card').forEach((c,i)=>setTimeout(()=>c.classList.add('in'),i*450));
+  countCards();setTimeout(()=>$('#go').classList.add('on'),1200);$('#hint').classList.add('on');setTimeout(()=>$('#hint').classList.remove('on'),7000)},900);
+}
+const born=new Date(2007,10,13),now0=new Date();
+const bd=new Date(now0.getFullYear(),10,13);
+let yrs=now0.getFullYear()-2007;if(now0<bd)yrs--;
+const isBday=now0.getMonth()==10&&now0.getDate()==13;
+function countUp(el,to,ms){const s=performance.now();(function f(n){const p=Math.min(1,(n-s)/ms);el.textContent=Math.round(to*(1-Math.pow(1-p,3))).toLocaleString('en-IN');if(p<1)requestAnimationFrame(f)})(s)}
+function countCards(){
+ countUp($('#yrs'),yrs,1800);
+ const left=Math.ceil((new Date(now0.getFullYear()+(now0<bd||isBday?0:1),10,13)-now0)/864e5);
+ $('#lapMsg').textContent=isBday?'Lap '+yrs+' completes TODAY! 🎂':(left>0?'Lap '+(yrs+1)+' ends in '+left+' day'+(left>1?'s':'')+'! 🎈':'');
+ const ms=Date.now()-born;countUp($('#days'),Math.floor(ms/864e5),2200);
+ setTimeout(()=>setInterval(tick,1000),2300);tick();
+}
+function tick(){const ms=Date.now()-born,r=ms%864e5,hh=Math.floor(r/36e5),mm=Math.floor(r%36e5/6e4),ss=Math.floor(r%6e4/1e3);
+ if(document.querySelector('#days').dataset.live||$('#days').textContent!=='0')$('#clock').textContent=`+ ${hh}h ${mm}m ${ss}s ⏱️`}
+
+/* slider */
+const ev=[
+["354","📚","Augustine is born","On 13 Nov 354, the thinker Augustine of Hippo was born. His big questions about time and the heart are still read today."],
+["1789","✍️","Franklin's famous line","Benjamin Franklin wrote in a letter that nothing is certain except death and taxes. Cheerful, right? 😄"],
+["1850","🏴‍☠️","A storyteller arrives","Robert Louis Stevenson, who wrote Treasure Island, was born on this day."],
+["1927","🚇","A tunnel under a river","The Holland Tunnel opened between New York and New Jersey, the first underwater highway tunnel of its kind for cars."],
+["1940","🧙","Fantasia premieres","Disney's Fantasia opened in New York, a film where music turns into dancing brooms and mountains."],
+["1955","🎭","Whoopi Goldberg is born","The actor and comedian who won an Oscar, a Grammy, an Emmy and a Tony was born on 13 Nov."],
+["1971","🚀","Mariner 9 reaches Mars","It became the first spacecraft ever to orbit another planet. A round of applause for the space nerds! 🔭"],
+["1998","💛","World Kindness Day","The world began marking 13 Nov as a day for kindness. Which suits someone with a heart as big as yours."],
+["2007","🎂","The BEST thing that happened","You were born. Everything else on this list was just the warm-up act. ✨"]];
+$('#track').innerHTML=ev.map(e=>`<div class="slide"><b>${e[0]}</b><em>${e[1]}</em><h3>${e[2]}</h3><p>${e[3]}</p></div>`).join('');
+$('#dots').innerHTML=ev.map(()=>'<i></i>').join('');
+const tr=$('#track'),dots=[...document.querySelectorAll('.dots i')];
+function dot(){const i=Math.round(tr.scrollLeft/tr.clientWidth);dots.forEach((d,j)=>d.classList.toggle('on',i==j))}
+tr.addEventListener('scroll',dot);dot();
+$('#next').onclick=()=>tr.scrollBy({left:tr.clientWidth,behavior:'smooth'});
+$('#prev').onclick=()=>tr.scrollBy({left:-tr.clientWidth,behavior:'smooth'});
+
+/* floating party emojis */
+const em=['🎈','🎉','✨','🎂','💖','⭐','🎁'];
+setInterval(()=>{const s=document.createElement('div');s.className='fl';s.textContent=em[Math.floor(Math.random()*em.length)];
+ s.style.left=Math.random()*95+'%';s.style.animationDuration=(7+Math.random()*6)+'s';s.style.fontSize=(18+Math.random()*18)+'px';
+ document.body.appendChild(s);setTimeout(()=>s.remove(),14000)},900);
+</script>
+</body>
+</html>

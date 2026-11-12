@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>For you</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden}
+body{font-family:'Caveat','Segoe Script',cursive;color:#f4d9e0;-webkit-tap-highlight-color:transparent}
+#stage{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.float{position:absolute;color:#ff6b8b;opacity:.5;animation:drift linear infinite;pointer-events:none;user-select:none}
+@keyframes drift{0%{transform:translateY(105vh) translateX(0) scale(var(--s))}50%{transform:translateY(50vh) translateX(18px) scale(var(--s))}100%{transform:translateY(-10vh) translateX(-10px) scale(var(--s))}}
+#envWrap{position:relative;width:min(70vw,300px);aspect-ratio:3/2;animation:bob 5s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-14px) rotate(1deg)}}
+.body{position:absolute;inset:0;background:#2a1018;border:1.5px solid #ff6b8b55;border-radius:8px;box-shadow:0 0 50px #ff6b8b33}
+.fold{position:absolute;inset:0;border-radius:8px;background:
+ linear-gradient(to top right,transparent 49.5%,#ff6b8b33 50%,transparent 50.6%) left/50% 100% no-repeat,
+ linear-gradient(to top left,transparent 49.5%,#ff6b8b33 50%,transparent 50.6%) right/50% 100% no-repeat}
+.flap{position:absolute;left:0;right:0;top:0;height:55%;background:#3a1621;border:1.5px solid #ff6b8b55;border-radius:8px 8px 0 0;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .9s ease}
+#envWrap.open .flap{transform:rotateX(180deg)}
+#heart{position:absolute;left:50%;top:50%;width:26%;transform:translate(-50%,-50%);background:none;border:0;padding:0;cursor:pointer;z-index:3;animation:beat 1.8s ease-in-out infinite;filter:drop-shadow(0 0 12px #ff6b8b)}
+@keyframes beat{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.12)}}
+#heart svg{width:100%;display:block}
+#hint{position:absolute;left:50%;top:100%;margin-top:6px;width:200px;transform:translateX(-10%);animation:bobHint 5s ease-in-out infinite;transition:opacity .6s}
+@keyframes bobHint{0%,100%{translate:0 0}50%{translate:0 6px}}
+#hint svg{width:130px;display:block;margin-left:10px;overflow:visible}
+#hint span{display:block;font-size:26px;line-height:1.1;margin-top:-4px}
+.gone{opacity:0;pointer-events:none}
+.burst{position:absolute;left:50%;top:50%;color:#ff6b8b;font-size:22px;pointer-events:none;animation:pop 1.6s ease-out forwards}
+@keyframes pop{to{transform:translate(var(--x),var(--y)) scale(.4);opacity:0}}
+@media (prefers-reduced-motion:reduce){.float,#envWrap,#heart,#hint{animation:none}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="envWrap">
+    <div class="body"></div><div class="fold"></div><div class="flap"></div>
+    <button id="heart" aria-label="Open">
+      <svg viewBox="0 0 32 29"><path fill="#ff4d73" d="M16 28C-8 12 4-2 16 7c12-9 24 5 0 21z"/></svg>
+    </button>
+    <div id="hint">
+      <svg viewBox="0 0 130 90" fill="none" stroke="#f4d9e0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 80 C 0 40, 50 10, 92 -30" transform="translate(0,28)"/>
+        <path d="M80 -8 L92 -2 L96 -16" transform="translate(0,28)"/>
+      </svg>
+      <span>Tap here</span>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var stage=document.getElementById('stage');
+  var glyphs=['♥','✦','·','✧','♡'];
+  for(var i=0;i<22;i++){
+    var f=document.createElement('div');f.className='float';
+    f.textContent=glyphs[i%glyphs.length];
+    f.style.left=Math.random()*100+'%';
+    f.style.fontSize=(10+Math.random()*16)+'px';
+    f.style.setProperty('--s',(0.7+Math.random()*0.8).toFixed(2));
+    f.style.animationDuration=(18+Math.random()*22)+'s';
+    f.style.animationDelay=(-Math.random()*30)+'s';
+    stage.appendChild(f);
+  }
+  var wrap=document.getElementById('envWrap'),heart=document.getElementById('heart'),hint=document.getElementById('hint');
+  heart.addEventListener('click',function(){
+    hint.classList.add('gone');wrap.classList.add('open');
+    for(var i=0;i<14;i++){
+      var b=document.createElement('div');b.className='burst';b.textContent='♥';
+      var a=Math.random()*Math.PI*2,d=80+Math.random()*120;
+      b.style.setProperty('--x',Math.cos(a)*d+'px');b.style.setProperty('--y',Math.sin(a)*d-40+'px');
+      b.style.fontSize=(14+Math.random()*16)+'px';
+      wrap.appendChild(b);
+      setTimeout((function(el){return function(){el.remove()}})(b),1700);
+    }
+    heart.disabled=true; // stops double taps
+    setTimeout(function(){
+      document.body.style.transition='opacity 1s';
+      document.body.style.opacity='0'; // fade to black
+    },1800);
+    setTimeout(function(){
+      window.location.href='page2.html'; // must be in the same folder
+    },2800);
+  });
+})();
+</script>
+</body>
+</html>
